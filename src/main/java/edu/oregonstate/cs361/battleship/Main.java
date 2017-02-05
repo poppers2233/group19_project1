@@ -6,6 +6,7 @@ import static spark.Spark.get;
 import static spark.Spark.post;
 import static spark.Spark.staticFiles;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 
@@ -51,6 +52,9 @@ public class Main {
     //This controller should take a json object from the front end, and place the ship as requested, and then return the object.
     private static String placeShip(Request req) {
 
+    	Random rand = new Random(System.currentTimeMillis());
+        int AICol, AIRow;
+        String AIOrientation;
     	
    //------------------------------Parsing and execution of the player's turn
         System.out.println("hello");
@@ -64,153 +68,348 @@ public class Main {
 
         System.out.println("row: " + row + " col: " + col + " id: " + id + " orientation: " + orientation);
         if(id.equals("aircraftCarrier")){
-            if(isValidLocation(model, row, col, orientation, 5)) {
+            if(isValidLocation(model, row, col, orientation, 5, true)) {
                 model.getAircraftCarrier().set_location(row, col, orientation);
+                Ship temp = model.getAIaircraftCarrier();
+                do
+                {
+                	AICol = rand.nextInt(boardWidth);
+                	AIRow = rand.nextInt(boardHeight);
+                	if(rand.nextInt(1) == 0)
+                		AIOrientation = "horizontal";
+                	else
+                		AIOrientation = "vertical";
+                	
+                	
+                }while(!isValidLocation(model, AIRow,AICol, AIOrientation, temp.get_length(), false));
+                
+                //coords are now valid (in theory)
+                
+                model.getAIaircraftCarrier().set_location(AIRow, AICol, AIOrientation);//Place a ship into
             }
         }
         else if(id.equals("battleship")){
-            if(isValidLocation(model, row, col, orientation, 5)) {
+            if(isValidLocation(model, row, col, orientation, 5, true)) {
                 model.getBattleship().set_location(row, col, orientation);
+                Ship temp = model.getAIbattleship();
+                do
+                {
+                	AICol = rand.nextInt(boardWidth);
+                	AIRow = rand.nextInt(boardHeight);
+                	if(rand.nextInt(1) == 0)
+                		AIOrientation = "horizontal";
+                	else
+                		AIOrientation = "vertical";
+                	
+                	
+                }while(!isValidLocation(model, AIRow,AICol, AIOrientation, temp.get_length(), false));
+                
+                //coords are now valid (in theory)
+                
+                model.getAIbattleship().set_location(AIRow, AICol, AIOrientation);//Place a ship into
             }
         }
         else if(id.equals("cruiser")){
-            if(isValidLocation(model, row, col, orientation, 5)) {
+            if(isValidLocation(model, row, col, orientation, 5, true)) {
                 model.getCruiser().set_location(row, col, orientation);
+                Ship temp = model.getAIcruiser();
+                do
+                {
+                	AICol = rand.nextInt(boardWidth);
+                	AIRow = rand.nextInt(boardHeight);
+                	if(rand.nextInt(1) == 0)
+                		AIOrientation = "horizontal";
+                	else
+                		AIOrientation = "vertical";
+                	
+                	
+                }while(!isValidLocation(model, AIRow,AICol, AIOrientation, temp.get_length(), false));
+                
+                //coords are now valid (in theory)
+                
+                model.getAIcruiser().set_location(AIRow, AICol, AIOrientation);//Place a ship into
             }
         }
         else if(id.equals("destroyer")){
-            if(isValidLocation(model, row, col, orientation, 5)) {
+            if(isValidLocation(model, row, col, orientation, 5, true)) {
                 model.getDestroyer().set_location(row, col, orientation);
+                Ship temp = model.getAIdestroyer();
+                do
+                {
+                	AICol = rand.nextInt(boardWidth);
+                	AIRow = rand.nextInt(boardHeight);
+                	if(rand.nextInt(1) == 0)
+                		AIOrientation = "horizontal";
+                	else
+                		AIOrientation = "vertical";
+                	
+                	
+                }while(!isValidLocation(model, AIRow,AICol, AIOrientation, temp.get_length(), false));
+                
+                //coords are now valid (in theory)
+                
+                model.getAIdestroyer().set_location(AIRow, AICol, AIOrientation);//Place a ship into
             }
         }
         else if(id.equals("submarine")){
-            if(isValidLocation(model, row, col, orientation, 5)) {
+            if(isValidLocation(model, row, col, orientation, 5, true)) {
                 model.getSubmarine().set_location(row, col, orientation);
+                Ship temp = model.getAIsubmarine();
+                do
+                {
+                	AICol = rand.nextInt(boardWidth);
+                	AIRow = rand.nextInt(boardHeight);
+                	if(rand.nextInt(1) == 0)
+                		AIOrientation = "horizontal";
+                	else
+                		AIOrientation = "vertical";
+                	
+                	
+                }while(!isValidLocation(model, AIRow,AICol, AIOrientation, temp.get_length(), false));
+                
+                //coords are now valid (in theory)
+                
+                model.getAIsubmarine().set_location(AIRow, AICol, AIOrientation);//Place a ship into
             }
 
         }
-        
-      //------------------------------Execution of the AI's turn
-        
-        Random rand = new Random(System.currentTimeMillis());
-        int AICol, AIRow, AIOrientation;
-        Ship temp = model.getUnplacedShip();
-        do
-        {
-        	AICol = rand.nextInt(boardWidth);
-        	AIRow = rand.nextInt(boardHeight);
-        	AIOrientation = rand.nextInt(1);
-        	
-        }while(!checkValidLocation(AICol,AIRow, AIOrientation, temp.get_length()));
-        
-        //coords are now valid (in theory)
-        
-        temp.set_location(AIRow, AICol, getOrientation(AIOrientation));//Place a ship into
         
         
         return gson.toJson(model);
     }
     
-    private static String getOrientation(int orientation)
-    {
-    	if(orientation == 0)
-    		return "horizontal";
-    	return "vertical";
-    }
-    
-    private static boolean isValidLocation(BattleshipModel model, int row, int col, String orientation, int length)//Needs to check to see if a given coordiante is valid for the ship to be placed at.  OTHER PARAMS MAY BE NEEDED
-    {
-        // aircraft carrier check
-        if(     (row != model.getAIaircraftCarrier().get_start().get_x() ) &&
-                (col != model.getAIaircraftCarrier().get_start().get_y() )   ) {
+    private static boolean isValidLocation(BattleshipModel model, int row, int col, String orientation, int length, boolean isPlayer)//Needs to check to see if a given coordiante is valid for the ship to be placed at.  OTHER PARAMS MAY BE NEEDED
+     {
+        if(isPlayer)
+        {
+            // aircraft carrier check
+            if(     (row == model.getAircraftCarrier().get_start().get_x() ) &&
+                    (col == model.getAircraftCarrier().get_start().get_y() )   ) {
+                return false;
+            }
+            else{
 
-            if (orientation.equals("horizontal")) {
-                for (int i = 0; i < length; i++) {
-                    Coord c = new Coord(row, col + i);
-                    if (poshelper(s, c))
-                        return false;
-                }
-            } else {
-                for (int i = 0; i < length; i++) {
-                    Coord c = new Coord(row + i, col);
-                    if (poshelper(s, c))
-                        return false;
+            	Ship s = model.getAircraftCarrier();
+            	
+                if (orientation.equals("horizontal")) {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row, col + i);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                } else {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row + i, col);
+                        if (posHelper(s, c))
+                            return false;
+                    }
                 }
             }
-        }
-        // battle ship check
-        if(     (row != model.getBattleship().get_start().get_x() ) &&
-                (col != model.getBattleship().get_start().get_y() )   ) {
+            // battle ship check
+            if(     (row == model.getBattleship().get_start().get_x() ) &&
+                    (col == model.getBattleship().get_start().get_y() )   ) {
+                return false;
+            }
+            else {
+                Ship s = model.getBattleship();
 
-            if (orientation.equals("horizontal")) {
-                for (int i = 0; i < length; i++) {
-                    Coord c = new Coord(row, col + i);
-                    if (poshelper(s, c))
-                        return false;
-                }
-            } else {
-                for (int i = 0; i < length; i++) {
-                    Coord c = new Coord(row + i, col);
-                    if (poshelper(s, c))
-                        return false;
+                if (orientation.equals("horizontal")) {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row, col + i);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                } else {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row + i, col);
+                        if (posHelper(s, c))
+                            return false;
+                    }
                 }
             }
-        }
-        // cruiser check
-        if(     (row != model.getCruiser().get_start().get_x() ) &&
-                (col != model.getCruiser().get_start().get_y() )   ) {
+            // cruiser check
+            if(     (row == model.getCruiser().get_start().get_x() ) &&
+                    (col == model.getCruiser().get_start().get_y() )   ) {
 
-            if (orientation.equals("horizontal")) {
-                for (int i = 0; i < length; i++) {
-                    Coord c = new Coord(row, col + i);
-                    if (poshelper(s, c))
-                        return false;
-                }
-            } else {
-                for (int i = 0; i < length; i++) {
-                    Coord c = new Coord(row + i, col);
-                    if (poshelper(s, c))
-                        return false;
+                return false;
+            }
+            else{
+            	Ship s = model.getCruiser();
+            	
+                if (orientation.equals("horizontal")) {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row, col + i);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                } else {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row + i, col);
+                        if (posHelper(s, c))
+                            return false;
+                    }
                 }
             }
-        }
-        // destroyer check
-        if(     (row != model.getDestroyer().get_start().get_x() ) &&
-                (col != model.getDestroyer().get_start().get_y() )   ) {
-
-            if (orientation.equals("horizontal")) {
-                for (int i = 0; i < length; i++) {
-                    Coord c = new Coord(row, col + i);
-                    if (poshelper(s, c))
-                        return false;
-                }
-            } else {
-                for (int i = 0; i < length; i++) {
-                    Coord c = new Coord(row + i, col);
-                    if (poshelper(s, c))
-                        return false;
+            // destroyer check
+            if(     (row == model.getDestroyer().get_start().get_x() ) &&
+                    (col == model.getDestroyer().get_start().get_y() )   ) {
+                return false;
+            }
+            else{
+            	Ship s = model.getDestroyer();
+            	
+                if (orientation.equals("horizontal")) {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row, col + i);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                } else {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row + i, col);
+                        if (posHelper(s, c))
+                            return false;
+                    }
                 }
             }
-        }
-        //submarine check
-        if(     (row != model.getSubmarine().get_start().get_x() ) &&
-                (col != model.getSubmarine().get_start().get_y() )   ) {
-
-            if (orientation.equals("horizontal")) {
-                for (int i = 0; i < length; i++) {
-                    Coord c = new Coord(row, col + i);
-                    if (poshelper(s, c))
-                        return false;
-                }
-            } else {
-                for (int i = 0; i < length; i++) {
-                    Coord c = new Coord(row + i, col);
-                    if (poshelper(s, c))
-                        return false;
+            //submarine check
+            if(     (row == model.getSubmarine().get_start().get_x() ) &&
+                    (col == model.getSubmarine().get_start().get_y() )   ) {
+                return false;
+            }
+            else{
+            	Ship s = model.getSubmarine();
+            	
+                if (orientation.equals("horizontal")) {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row, col + i);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                } else {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row + i, col);
+                        if (posHelper(s, c))
+                            return false;
+                    }
                 }
             }
+        	return true;
         }
-    	return true;
+        else
+        {
+        	// aircraft carrier check
+            if(     (row == model.getAIaircraftCarrier().get_start().get_x() ) &&
+                    (col == model.getAIaircraftCarrier().get_start().get_y() )   ) {
+                return false;
+            }
+            else{
+            	Ship s = model.getAIaircraftCarrier();
+            	
+                if (orientation.equals("horizontal")) {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row, col + i);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                } else {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row + i, col);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                }
+            }
+            // battle ship check
+            if(     (row == model.getAIbattleship().get_start().get_x() ) &&
+                    (col == model.getAIbattleship().get_start().get_y() )   ) {
+                return false;
+            }
+            else{
+            	Ship s = model.getAIbattleship();
+            	
+                if (orientation.equals("horizontal")) {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row, col + i);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                } else {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row + i, col);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                }
+            }
+            // cruiser check
+            if(     (row == model.getAIcruiser().get_start().get_x() ) &&
+                    (col == model.getAIcruiser().get_start().get_y() )   ) {
+                return false;
+            }
+            else{
+            	Ship s = model.getAIcruiser();
+            	
+                if (orientation.equals("horizontal")) {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row, col + i);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                } else {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row + i, col);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                }
+            }
+            // destroyer check
+            if(     (row == model.getAIdestroyer().get_start().get_x() ) &&
+                    (col == model.getAIdestroyer().get_start().get_y() )   ) {
+                return false;
+            }
+            else{
+            	Ship s = model.getAIdestroyer();
+            	
+                if (orientation.equals("horizontal")) {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row, col + i);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                } else {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row + i, col);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                }
+            }
+            //submarine check
+            if(     (row == model.getAIsubmarine().get_start().get_x() ) &&
+                    (col == model.getAIsubmarine().get_start().get_y() )   ) {
+                return false;
+            }
+            else{
+            	Ship s = model.getAIsubmarine();
+            	
+                if (orientation.equals("horizontal")) {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row, col + i);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                } else {
+                    for (int i = 0; i < length; i++) {
+                        Coord c = new Coord(row + i, col);
+                        if (posHelper(s, c))
+                            return false;
+                    }
+                }
+            }
+        	return true;
+        }
     }
 
     private static boolean checkValidShot(BattleshipModel model, Coord coord)//Checks to see if a shot being done by the AI has already been done
@@ -221,20 +420,20 @@ public class Main {
     		return false;
     	}
     	//Check to see if thats been fired before
-    	for (int i = 0; i < model.get_computer_hits().size(); i++) {
-			if(coord.get_x() == model.get_computer_hits().get(i).get_x())//check if they have matching X coords
+    	for (int i = 0; i < model.get_player_hits().size(); i++) {
+			if(coord.get_x() == model.get_player_hits().get(i).get_x())//check if they have matching X coords
 			{
-				if(coord.get_y() == model.get_computer_hits().get(i).get_y())//check if they have matching Y coords as well
+				if(coord.get_y() == model.get_player_hits().get(i).get_y())//check if they have matching Y coords as well
 				{
 					return false;
 				}
 			}	
 		}
     	
-    	for (int i = 0; i < model.get_computer_misses().size(); i++) {
-			if(coord.get_x() == model.get_computer_misses().get(i).get_x())//check if they have matching X coords
+    	for (int i = 0; i < model.get_player_misses().size(); i++) {
+			if(coord.get_x() == model.get_player_misses().get(i).get_x())//check if they have matching X coords
 			{
-				if(coord.get_y() == model.get_computer_misses().get(i).get_y())//check if they have matching Y coords as well
+				if(coord.get_y() == model.get_player_misses().get(i).get_y())//check if they have matching Y coords as well
 				{
 					return false;
 				}
@@ -242,6 +441,35 @@ public class Main {
 		}
     	
     	return true;
+    }
+
+    //Used to make sure the player does not fire at the same spot more than once.
+    private static boolean checkPlayerShot(BattleshipModel model, Coord coord)//Checks to see if a shot being done by the AI has already been done
+    {
+        //Check to see if thats been fired before
+        for (int i = 0; i < model.get_computer_hits().size(); i++) {
+            if(coord.get_x() == model.get_computer_hits().get(i).get_x())//check if they have matching X coords
+            {
+                if(coord.get_y() == model.get_computer_hits().get(i).get_y())//check if they have matching Y coords as well
+                {
+                    System.out.println("False");
+                    return false;
+                }
+            }
+        }
+
+        for (int i = 0; i < model.get_computer_misses().size(); i++) {
+            if(coord.get_x() == model.get_computer_misses().get(i).get_x())//check if they have matching X coords
+            {
+                if(coord.get_y() == model.get_computer_misses().get(i).get_y())//check if they have matching Y coords as well
+                {
+                    System.out.println("False");
+                    return false;
+                }
+            }
+        }
+        System.out.println("checkplayershot true");
+        return true;
     }
     
     //Similar to placeShip, but with firing.
@@ -255,7 +483,7 @@ public class Main {
     	//------------------------------Parsing and execution of the player's turn
     	
     	
-        System.out.println("fireAt called.");
+        //System.out.println("fireAt called.");
         BattleshipModel model = getModelFromReq(req);
         Gson gson = new Gson();
         int[] pos = new int[]{0, 0};                                //to be passed to the position helper function
@@ -263,73 +491,63 @@ public class Main {
         pos[1] = Integer.parseInt(req.params(":row"));
         Coord shot = new Coord(pos[0], pos[1]);
 
-        System.out.println(pos[0]);
-        System.out.println(pos[1]);
+        //System.out.println(pos[0]);
+        //System.out.println(pos[1]);
 
-        //if we register any hits
-        if(posHelper(model.getAIaircraftCarrier(), shot) || posHelper(model.getAIbattleship(), shot) || posHelper(model.getAIcruiser(), shot) || posHelper(model.getAIdestroyer(), shot) || posHelper(model.getAIsubmarine(), shot)){
-            //mark as a hit for the player
-            model.add_player_hit(shot);
-            System.out.println("hit!");
-        } else {
-            //mark as a miss for the player
-            model.add_player_miss(shot);
-            System.out.println("miss!");
+        //>>>>>This if statement makes sure that the user has not already fired at the location. if they have it will prevent
+        // the AI from fireing that turn and NOT add to the users hits/misses to prevent that array from having
+        // multiple of the same hit/ miss
+        if(checkPlayerShot(model, shot)) {
+            //if we register any hits
+            if (posHelper(model.getAIaircraftCarrier(), shot) || posHelper(model.getAIbattleship(), shot) || posHelper(model.getAIcruiser(), shot) || posHelper(model.getAIdestroyer(), shot) || posHelper(model.getAIsubmarine(), shot)) {
+                //mark as a hit for the player
+                model.add_computer_hit(shot);
+                //System.out.println("hit!");
+            } else {
+                //mark as a miss for the player
+                model.add_computer_miss(shot);
+                //System.out.println("miss!");
 
+            }
+
+
+            //add to hit/miss array in the gamestate
+            //possibly have Computer fire back in this function for ease of programming?
+            System.out.println(gson.toJson(model));
+
+            //Need to check to see if the game is now complete (and who won)
+
+
+            //------------------------------Execution of the AI's turn
+
+
+            //If game isn't over, AI does his fire
+
+
+            do {
+                mycoord = new Coord(rand.nextInt(boardHeight), rand.nextInt(boardWidth));
+
+            } while (!checkValidShot(model, mycoord));//while the shot has already been done
+
+            //check to see if the shot hits or misses
+
+            //if we register any hits
+            if (posHelper(model.getAircraftCarrier(), mycoord) || posHelper(model.getBattleship(), mycoord) || posHelper(model.getCruiser(), mycoord) || posHelper(model.getDestroyer(), mycoord) || posHelper(model.getSubmarine(), mycoord)) {
+                //mark as a hit for the computer
+                model.add_player_hit(mycoord);
+                //System.out.println("hit!");
+            } else {
+                //mark as a miss for the computer
+                model.add_player_miss(mycoord);
+                //System.out.println("miss!");
+
+            }
         }
-
-
-        //add to hit/miss array in the gamestate
-        //possibly have Computer fire back in this function for ease of programming?
-        System.out.println(gson.toJson(model));
-      
-
-    	//int[] mycoord = new int[2];//row,col
-
-    	//Player does his fire things
-        
-    	
-    	//Need to check to see if the game is now complete (and who won)
-    	
-    	
-        //------------------------------Execution of the AI's turn
-        
-        
-    	//If game isn't over, AI does his fire
-    	
-    	
-    	if(model.getAIShot() == null)//If the last show wasn't a hit
-    	{
-    		do
-    		{
-    			mycoord = new Coord(rand.nextInt(boardHeight), rand.nextInt(boardWidth));
- 
-    		}while(!checkValidShot(model,mycoord));//while the shot has already been done
-    	}
-    	else
-    	{
-    		mycoord = new Coord(model.getAIShot().get_x() + 1, model.getAIShot().get_y());
-    		if(!checkValidShot(model, mycoord))//If thats wrong
-    			mycoord = new Coord(model.getAIShot().get_x() - 1, model.getAIShot().get_y());
-    	}
-    	
-    	//check to see if the shot hits or misses
-    	
-    	 //if we register any hits
-        if(posHelper(model.getAIaircraftCarrier(), shot) || posHelper(model.getAIbattleship(), shot) || posHelper(model.getAIcruiser(), shot) || posHelper(model.getAIdestroyer(), shot) || posHelper(model.getAIsubmarine(), shot)){
-            //mark as a hit for the player
-            model.add_computer_hit(shot);
-            model.setAIShot(shot);
-            System.out.println("hit!");
-        } else {
-            //mark as a miss for the player
-            model.add_computer_miss(shot);
-            model.setAIShot(null);
-            System.out.println("miss!");
-
-        }
-    	
     	//Check to see if the game is over now
+        
+        if(game_over(model))
+        	game_complete(model, false);
+        
     	 return gson.toJson(model);
     
     }
@@ -340,11 +558,11 @@ public class Main {
 
         if(pos.get_x() >= start.get_x() && pos.get_x() <= end.get_x()) {           //if the x of the shot is within x bounds of ship
             if (pos.get_y() >= start.get_y() && pos.get_y() <= end.get_y()) {      //if the y of the shot is within y bounds of ship
-                System.out.println("True");
+                //System.out.println("True");
                 return true;
             }
         }
-        System.out.println("False");
+        //System.out.println("False");
         return false;
     }
      private static boolean game_over(BattleshipModel model){
@@ -357,5 +575,84 @@ public class Main {
 
         else
             return false;
+     }
+     
+     private static void game_complete(BattleshipModel model, boolean isPlayer)
+     {
+    	 ArrayList<Coord> temp = new ArrayList<Coord>();
+    	 model.get_player_hits().clear();
+		 model.get_computer_hits().clear();
+		 model.get_computer_misses().clear();
+		 model.get_player_misses().clear();
+    	 if(!isPlayer)
+    	 {
+    		 
+    		 //Add in the coords for the W and L for the winner and loser
+    		 //MAKES THE W
+    		 temp.add(new Coord(2,1));temp.add(new Coord(2,2));temp.add(new Coord(3,1));
+    		 temp.add(new Coord(3,2));temp.add(new Coord(4,1));temp.add(new Coord(4,2));
+    		 temp.add(new Coord(4,3));temp.add(new Coord(5,2));temp.add(new Coord(5,3));
+    		 temp.add(new Coord(6,2));temp.add(new Coord(6,3));temp.add(new Coord(6,4));
+    		 temp.add(new Coord(7,3));temp.add(new Coord(7,4));temp.add(new Coord(7,5));
+    		 temp.add(new Coord(8,4));temp.add(new Coord(8,5));temp.add(new Coord(7,6));
+    		 temp.add(new Coord(6,6));temp.add(new Coord(7,7));temp.add(new Coord(8,7));
+    		 temp.add(new Coord(8,7));temp.add(new Coord(7,8));temp.add(new Coord(6,8));
+    		 temp.add(new Coord(6,9));temp.add(new Coord(5,8));temp.add(new Coord(5,9));
+    		 temp.add(new Coord(4,8));temp.add(new Coord(4,9));temp.add(new Coord(4,10));
+    		 temp.add(new Coord(3,9));temp.add(new Coord(3,10));temp.add(new Coord(2,9));
+    		 temp.add(new Coord(2,10));
+    		 
+    		 model.setPlayerHits(temp);
+    		 
+    		 
+    		 //MAKES THE L
+    		 temp = new ArrayList<Coord>();
+    		 
+    		 temp.add(new Coord(2,4));temp.add(new Coord(2,5));temp.add(new Coord(3,4));
+    		 temp.add(new Coord(3,5));temp.add(new Coord(4,4));temp.add(new Coord(4,5));
+    		 temp.add(new Coord(5,4));temp.add(new Coord(5,5));temp.add(new Coord(6,4));
+    		 temp.add(new Coord(6,5));temp.add(new Coord(7,4));temp.add(new Coord(7,5));
+    		 temp.add(new Coord(8,4));temp.add(new Coord(8,5));temp.add(new Coord(8,6));
+    		 temp.add(new Coord(8,7));temp.add(new Coord(8,8));temp.add(new Coord(9,4));
+    		 temp.add(new Coord(9,5));temp.add(new Coord(9,6));temp.add(new Coord(9,7));
+    		 temp.add(new Coord(9,8));
+    		 
+    		 model.setComputerHits(temp);
+    		 
+    	 }
+    	 else
+    	 {
+    		//Add in the coords for the W and L for the winner and loser
+    		 //MAKES THE W
+    		 temp.add(new Coord(2,1));temp.add(new Coord(2,2));temp.add(new Coord(3,1));
+    		 temp.add(new Coord(3,2));temp.add(new Coord(4,1));temp.add(new Coord(4,2));
+    		 temp.add(new Coord(4,3));temp.add(new Coord(5,2));temp.add(new Coord(5,3));
+    		 temp.add(new Coord(6,2));temp.add(new Coord(6,3));temp.add(new Coord(6,4));
+    		 temp.add(new Coord(7,3));temp.add(new Coord(7,4));temp.add(new Coord(7,5));
+    		 temp.add(new Coord(8,4));temp.add(new Coord(8,5));temp.add(new Coord(7,6));
+    		 temp.add(new Coord(6,6));temp.add(new Coord(7,7));temp.add(new Coord(8,7));
+    		 temp.add(new Coord(8,7));temp.add(new Coord(7,8));temp.add(new Coord(6,8));
+    		 temp.add(new Coord(6,9));temp.add(new Coord(5,8));temp.add(new Coord(5,9));
+    		 temp.add(new Coord(4,8));temp.add(new Coord(4,9));temp.add(new Coord(4,10));
+    		 temp.add(new Coord(3,9));temp.add(new Coord(3,10));temp.add(new Coord(2,9));
+    		 temp.add(new Coord(2,10));
+    		 
+    		 model.setComputerHits(temp);
+    		 
+    		 
+    		 //MAKES THE L
+    		 temp = new ArrayList<Coord>();
+    		 
+    		 temp.add(new Coord(2,4));temp.add(new Coord(2,5));temp.add(new Coord(3,4));
+    		 temp.add(new Coord(3,5));temp.add(new Coord(4,4));temp.add(new Coord(4,5));
+    		 temp.add(new Coord(5,4));temp.add(new Coord(5,5));temp.add(new Coord(6,4));
+    		 temp.add(new Coord(6,5));temp.add(new Coord(7,4));temp.add(new Coord(7,5));
+    		 temp.add(new Coord(8,4));temp.add(new Coord(8,5));temp.add(new Coord(8,6));
+    		 temp.add(new Coord(8,7));temp.add(new Coord(8,8));temp.add(new Coord(9,4));
+    		 temp.add(new Coord(9,5));temp.add(new Coord(9,6));temp.add(new Coord(9,7));
+    		 temp.add(new Coord(9,8));
+    		 
+    		 model.setPlayerHits(temp);
+    	 }
      }
 }
